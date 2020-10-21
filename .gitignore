@@ -1,0 +1,5 @@
+# IntelliJ IDEA project settings
+/.idea/
+
+# IntelliJ IDEA module settings
+*.iml
