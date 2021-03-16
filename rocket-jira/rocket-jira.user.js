@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Rocket Jira
 // @homepage     https://github.com/deftbrain/userscripts/tree/main/rocket-jira
-// @version      1.1
+// @version      1.2.0
 // @description  A userscript that helps to automate some chore in Jira. The only feature for now is creating many subtasks (with specified estimate, assignee, and one custom select field) for a Jira issue from a context.
 // @author       https://github.com/deftbrain
 // @match        https://*.atlassian.net/*
@@ -29,6 +29,7 @@
 	const CONFIG_JIRA_ENTITY_NAME_ID_DELIMITER = ' @ ';
 	const JIRA_API_BASE_URL = `${window.location.protocol}//${window.location.hostname}/rest/api/2`;
 	const JIRA_CUSTOM_SELECT_FIELD_SCHEMA = 'com.atlassian.jira.plugin.system.customfieldtypes:select';
+	const DEFAULT_SUBTASKS = 'Test changes/1h, Update documentation/30m';
 
 	setupMenu();
 
@@ -46,22 +47,34 @@
 		}
 
 		const parentIssueId = getParentIssueId();
-		const subtasks = prompt('Subtask names and estimates:', 'First subtask summary/2h, Second subtask summary/1h 30m');
-		if (!subtasks) {
-			return;
-		}
+		let subtasks = DEFAULT_SUBTASKS;
+		let areSubtasksCorrect = false;
+		let subtaskEstimateMap;
+		askingSubtasks:
+			do {
+				subtasks = prompt('Subtask names and estimates:', subtasks);
+				if (!subtasks) {
+					return;
+				}
 
-		const subtaskEstimateMap = {};
-		for (const nameAndEstimate of subtasks.split(',')) {
-			let [summary, estimate] = nameAndEstimate.trim().split('/');
-			summary = summary && summary.trim();
-			estimate = estimate && estimate.trim();
-			if (!summary || !estimate) {
-				alert(`Invalid input. Please copy the input, correct it and try again. Input: ${subtasks}`);
-				return;
-			}
-			subtaskEstimateMap[summary] = estimate;
-		}
+				subtaskEstimateMap = {}
+				for (const nameAndEstimate of subtasks.split(',')) {
+					let [summary, estimate] = nameAndEstimate.trim().split('/');
+					summary = summary && summary.trim();
+					estimate = estimate && estimate.trim();
+					if (!summary || !estimate) {
+						alert("Error: Invalid input.\n\nRequired format:\n"
+							+ "SUBTASK1_NAME/ESTIMATE1, SUBTASK2_NAME/ESTIMATE2\n\n"
+							+ "Example:\n"
+							+ DEFAULT_SUBTASKS
+						);
+						continue askingSubtasks;
+					}
+					subtaskEstimateMap[summary] = estimate;
+				}
+				areSubtasksCorrect = true;
+			} while (!areSubtasksCorrect);
+
 		return sendRequest(JIRA_API_BASE_URL + '/myself')
 			.then(data => {
 				const issues = [];
