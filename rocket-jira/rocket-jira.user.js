@@ -384,14 +384,15 @@
 					fieldProps = {
 						section: CONFIG_SECTION_TEMPO_TIMESHEET,
 						type: 'checkbox',
-						default: true
+						default: false
 					};
 					break;
 				case CONFIG_FIELD_TEMPO_DAILY_WORKLOGS:
 					fieldProps = {
 						type: 'textarea',
 						cols: 50,
-						rows: 25
+						rows: 15,
+						default: '[]'
 					};
 					break;
 			}

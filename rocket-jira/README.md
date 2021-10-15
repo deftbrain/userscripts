@@ -34,18 +34,26 @@ Avaiable features:
 1. Click the `Close` button.
 
 ### Adjust filling out the Tempo.io weekly timesheet
-1. Go to the Tempo.io page with a weekly timesheet in your Jira instance in a separate tab (it should be something like https://your.jira.hostname/secure/Tempo.jspa);
+1. Go to the Tempo.io plug-in page with a weekly timesheet in your Jira instance in a separate tab (it should be something like https://your.jira.hostname/secure/Tempo.jspa);
 1. Open the `Network` tab in the `DevTool` panel of your browser;
-1. Log time that you log everyday for a particular task for any of available days (for one day only!) via Tempo.io interface integrated into your Jira instance;
-1. Find an AJAX POST request to the Tempo.io endpoint (should be something like https://your.jira.hostname/rest/tempo-timesheets/4/worklogs/).
-1. Copy a JSON object from the request body. Should be something like: `{"attributes": { "customAttributeName": { "name": "Attribute Name", "workAttributeId": 2, "value": "attributeValue" } }, "billableSeconds": "", "worker": "firstname.secondname", "comment": null, "started": "2021-10-11", "timeSpentSeconds": 3600, "originTaskId": "123345", "remainingEstimate": 0, "endDate": null, "includeNonWorkingDays": false}`
-1. Add that JSON onbject to a JSON array without any chnages. Should be something like: `[{"attributes": { "customAttributeName": { "name": "Attribute Name", "workAttributeId": 2, "value": "attributeValue" } }, "billableSeconds": "", "worker": "firstname.secondname", "comment": null, "started": "2021-10-11", "timeSpentSeconds": 3600, "originTaskId": "123345", "remainingEstimate": 0, "endDate": null, "includeNonWorkingDays": false}]`
-1. Log time that you log everyday for another task if needed and add the related JSON object from a request body to the array as well. Should be something like: `[{"attributes": { "customAttributeName": { "name": "Attribute Name", "workAttributeId": 2, "value": "attributeValue" } }, "billableSeconds": "", "worker": "firstname.secondname", "comment": null, "started": "2021-10-11", "timeSpentSeconds": 3600, "originTaskId": "123345", "remainingEstimate": 0, "endDate": null, "includeNonWorkingDays": false}, {"attributes": { "customAttributeName": { "name": "Attribute Name", "workAttributeId": 2, "value": "attributeValue" } }, "billableSeconds": "", "worker": "firstname.secondname", "comment": null, "started": "2021-10-11", "timeSpentSeconds": 23400, "originTaskId": "567890", "remainingEstimate": 0, "endDate": null, "includeNonWorkingDays": false}]`
-1. Copy the final JSON array into the `Daily worklogs` textarea in the userscript `Preferences` window;
-1. Uncheck the `Confirm affected dates before sending worklogs?` checkbox if you don't want to see a confirmation dialog before sending weekly timesheet to Jira;
+1. Log time that you log everyday for a particular task for any available day (for one day only!);
+1. Find an AJAX POST request that was sent to the Tempo.io endpoint after logging time via the plug-in (should be something like https://your.jira.hostname/rest/tempo-timesheets/4/worklogs/).
+1. Copy a JSON object declaration from the request's body and insert it as an element into the predefined JSON array in the `Daily worklogs` textarea in the userscript `Preferences` window. It should look like:
+
+        [{"attributes": { "customAttributeName": { "name": "Attribute Name", "workAttributeId": 2, "value": "attributeValue" } }, "billableSeconds": "", "worker": "firstname.secondname", "comment": null, "started": "2021-10-11", "timeSpentSeconds": 3600, "originTaskId": "123345", "remainingEstimate": 0, "endDate": null, "includeNonWorkingDays": false}]
+
+Elements from this array will be used as templates for logging time for every working day of a week (current week by default). 
+1. If you want to automate logging time for another task also, repeat logging time via the Tempo.io plug-in interface and add a related JSON object declaration to the same array. It should look like:
+
+        [
+             {"attributes": { "customAttributeName": { "name": "Attribute Name", "workAttributeId": 2, "value": "attributeValue" } }, "billableSeconds": "", "worker": "firstname.secondname", "comment": null, "started": "2021-10-11", "timeSpentSeconds": 3600, "originTaskId": "123345", "remainingEstimate": 0, "endDate": null, "includeNonWorkingDays": false},
+             {"attributes": { "customAttributeName": { "name": "Attribute Name", "workAttributeId": 2, "value": "attributeValue" } }, "billableSeconds": "", "worker": "firstname.secondname", "comment": null, "started": "2021-10-11", "timeSpentSeconds": 23400, "originTaskId": "567890", "remainingEstimate": 0, "endDate": null, "includeNonWorkingDays": false}
+        ]
+
+1. Check the `Confirm affected dates before sending worklogs?` checkbox if you want to see a confirmation dialog before sending weekly timesheet to Jira. That confirmation dialog also allows you to send timesheet for the passed week instead of current one if needed;
 1. Click the `Save` button;
 1. Click the `Close` button.
-1. Remove time logged manually from the timesheet because the script will create it for every day from the weekly timesheet (by default from the current week timesheet) using elements from the JSON array template (only date will be changed for every day).
+1. Remove the time logged manually via the Tempo.io plug-in interface because the userscript will create it also when you ask for that. The script doesn't check that some time was already logged in. 
 
 ## Usage
 ### Creating subtasks
@@ -58,9 +66,9 @@ Avaiable features:
 ### Filling out the Tempo.io weekly timesheet
 1. Open any page of your Jira instance in the browser;
 1. Staying in the same tab, click the Tampermonkey extension icon -> `Rocket Jira` -> `Fill out Tempo.io weekly timesheet`;
-1. If you didn't disabled the confirmation dialog you will see dates that will be affected and you also will get an ability to log time for a previous week (read information form the dialog for more details);
+1. If you have the confirmation dialog enabled, you will see dates that will be affected and will also be able to log time for a previous week instead of the current one if needed;
 1. Click OK if dates looks okay;
-1. If you did that staying on the Tempo.io page in your Jira instance, the page will be reloaded to let you see filled out timesheet. Otherwise the Tempo.io page will be opened in a new tab automatically once operation is completed.
+1. If you did that staying on the Tempo.io plug-in page in your Jira instance, the page will be reloaded to let you see filled out timesheet. Otherwise the Tempo.io page will be opened in a new tab automatically once operation is completed.
 
 ## Getting updates
 By default, Tampermonkey checks for userscript updates every day.
